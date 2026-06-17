@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String @id @default(cuid())
+  firebaseUid String @unique
+
+  email String? @unique
+  name  String?
+
+  isPremium Boolean @default(false)
+
+  reminders     Reminder[]
+  subscriptions Subscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Reminder {
+  id String @id @default(cuid())
+
+  title String
+
+  amount Decimal?
+
+  category String
+
+  dueDate DateTime
+
+  repeatType RepeatType
+
+  isActive Boolean @default(true)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id String @id @default(cuid())
+
+  name String
+
+  amount Decimal
+
+  billingType BillingType
+
+  renewalDate DateTime
+
+  autoPay Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RepeatType {
+  ONCE
+  MONTHLY
+  YEARLY
+}
+
+enum BillingType {
+  MONTHLY
+  YEARLY
+}
