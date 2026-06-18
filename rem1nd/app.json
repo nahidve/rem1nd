@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "rem1nd",
+    "slug": "rem1nd",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
+    "scheme": "rem1nd",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -38,7 +38,9 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
