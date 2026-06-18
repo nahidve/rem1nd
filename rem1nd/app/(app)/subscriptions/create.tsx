@@ -1,25 +1,26 @@
 import { useState } from "react";
 import { View, TextInput, Pressable, Text, Alert } from "react-native";
-import { createReminder } from "../../../src/api/reminder.api";
+import { createSubscription } from "../../../src/api/subscription.api";
 import { useRouter } from "expo-router";
 
-export default function CreateReminder() {
+export default function CreateSubscription() {
   const router = useRouter();
 
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [renewalDate, setRenewalDate] = useState("");
 
   const handleCreate = async () => {
     try {
-      await createReminder({
-        title,
-        category,
-        dueDate: new Date(dueDate).toISOString(),
-        repeatType: "ONCE",
+      await createSubscription({
+        name,
+        amount: Number(amount),
+        billingType: "MONTHLY",
+        renewalDate: new Date(renewalDate).toISOString(),
+        autoPay: false,
       });
 
-      router.replace("/(app)");
+      router.replace("/subscriptions/create");
     } catch (e: any) {
       Alert.alert("Error", e.message);
     }
@@ -28,23 +29,24 @@ export default function CreateReminder() {
   return (
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
       <TextInput
-        placeholder="Title"
-        value={title}
-        onChangeText={setTitle}
+        placeholder="Name"
+        value={name}
+        onChangeText={setName}
         style={{ borderWidth: 1, padding: 12 }}
       />
 
       <TextInput
-        placeholder="Category"
-        value={category}
-        onChangeText={setCategory}
+        placeholder="Amount"
+        value={amount}
+        onChangeText={setAmount}
+        keyboardType="numeric"
         style={{ borderWidth: 1, padding: 12 }}
       />
 
       <TextInput
-        placeholder="Due Date (YYYY-MM-DD HH:mm)"
-        value={dueDate}
-        onChangeText={setDueDate}
+        placeholder="Renewal Date (YYYY-MM-DD)"
+        value={renewalDate}
+        onChangeText={setRenewalDate}
         style={{ borderWidth: 1, padding: 12 }}
       />
 

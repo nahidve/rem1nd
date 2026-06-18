@@ -41,6 +41,15 @@ export default function Home() {
         </Text>
       </Pressable>
 
+      <Pressable
+        onPress={() => router.push("/subscriptions")}
+        style={{ padding: 10, backgroundColor: "black", marginTop: 10 }}
+      >
+        <Text style={{ color: "white", textAlign: "center" }}>
+          Subscriptions
+        </Text>
+      </Pressable>
+
       {loading ? (
         <Text>Loading...</Text>
       ) : (

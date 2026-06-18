@@ -1,4 +1,5 @@
 import { api } from "./axios";
+import { scheduleReminderNotification } from "../utils/notifications";
 
 export type Reminder = {
   id: string;
@@ -23,5 +24,14 @@ export async function createReminder(data: {
   repeatType: "ONCE" | "MONTHLY" | "YEARLY";
 }) {
   const res = await api.post("/reminders", data);
-  return res.data.data;
+
+  const reminder = res.data.data;
+
+  // schedule notification locally
+  await scheduleReminderNotification(
+    reminder.title,
+    new Date(reminder.dueDate),
+  );
+
+  return reminder;
 }
