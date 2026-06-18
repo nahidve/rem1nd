@@ -1,77 +1,79 @@
-import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, Pressable } from "react-native";
-import { getReminders, Reminder } from "../../src/api/reminder.api";
+import { View, Text, FlatList } from "react-native";
+import { getDashboard } from "../../src/api/analytics.api";
 
 export default function Home() {
-  const router = useRouter();
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = async () => {
-    try {
-      const data = await getReminders();
-      setReminders(data);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [data, setData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    load();
+    let active = true;
+    (async () => {
+      try {
+        const res = await getDashboard();
+        if (active) {
+          setData(res);
+        }
+      } catch (err: any) {
+        if (active) {
+          setError(err.message || "Failed to load dashboard");
+        }
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
+        <Text style={{ color: "red", textAlign: "center" }}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (!data) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
-      <Text style={{ fontSize: 22, fontWeight: "600" }}>Reminders</Text>
+      <Text style={{ fontSize: 22, fontWeight: "600" }}>
+        Dashboard
+      </Text>
 
-      <Pressable
-        onPress={load}
-        style={{ padding: 10, backgroundColor: "black" }}
-      >
-        <Text style={{ color: "white", textAlign: "center" }}>Refresh</Text>
-      </Pressable>
+      <Text>Total Monthly Spend: ₹{data.totalMonthlySpend}</Text>
 
-      <Pressable
-        onPress={() => router.push("/(app)/reminders/create")}
-        style={{ padding: 10, backgroundColor: "black" }}
-      >
-        <Text style={{ color: "white", textAlign: "center" }}>
-          + Add Reminder
-        </Text>
-      </Pressable>
+      <Text>Subscriptions: {data.subscriptionCount}</Text>
 
-      <Pressable
-        onPress={() => router.push("/subscriptions")}
-        style={{ padding: 10, backgroundColor: "black", marginTop: 10 }}
-      >
-        <Text style={{ color: "white", textAlign: "center" }}>
-          Subscriptions
-        </Text>
-      </Pressable>
+      <Text>Upcoming Payments: {data.upcomingReminders}</Text>
 
-      {loading ? (
-        <Text>Loading...</Text>
-      ) : (
-        <FlatList
-          data={reminders}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                padding: 12,
-                borderWidth: 1,
-                borderRadius: 8,
-                marginBottom: 10,
-              }}
-            >
-              <Text style={{ fontWeight: "600" }}>{item.title}</Text>
-              <Text>{item.category}</Text>
-              <Text>{item.repeatType}</Text>
-            </View>
-          )}
-        />
-      )}
+      <Text style={{ marginTop: 10, fontWeight: "600" }}>
+        Next 7 Days Reminders
+      </Text>
+
+      <FlatList
+        data={data.reminders}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View
+            style={{
+              padding: 12,
+              borderWidth: 1,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ fontWeight: "600" }}>{item.title}</Text>
+            <Text>{new Date(item.dueDate).toDateString()}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 }
