@@ -14,22 +14,23 @@ model User {
   email String? @unique
   name  String?
 
-  isPremium Boolean @default(false)
+  isPremium    Boolean   @default(false)
+  premiumUntil DateTime?
 
   reminders     Reminder[]
   subscriptions Subscription[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([firebaseUid])
 }
 
 model Reminder {
   id String @id @default(cuid())
 
-  title String
-
-  amount Decimal?
-
+  title    String
+  amount   Decimal?
   category String
 
   dueDate DateTime
@@ -39,10 +40,13 @@ model Reminder {
   isActive Boolean @default(true)
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([dueDate])
 }
 
 model Subscription {
@@ -59,10 +63,13 @@ model Subscription {
   autoPay Boolean @default(false)
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([renewalDate])
 }
 
 enum RepeatType {
