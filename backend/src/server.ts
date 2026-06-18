@@ -9,6 +9,8 @@ import morgan from "morgan";
 import { env } from "./config/env.js";
 import { prisma } from "./config/prisma.js";
 
+import { processDueReminders } from "./jobs/reminder.job.js";
+
 import routes from "./routes/index.js";
 
 import { notFound } from "./middleware/not-found.js";
@@ -34,12 +36,16 @@ app.use(errorHandler);
 
 const PORT = env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
 
-  prisma.$connect().then(() => {
-    console.log("Connected to database");
-  });
+  await prisma.$connect();
+  console.log("Connected to database");
+
+  // START BACKGROUND JOB
+  setInterval(() => {
+    processDueReminders();
+  }, 60 * 1000);
 });
 
 const signals = ["SIGTERM", "SIGINT", "SIGHUP"];

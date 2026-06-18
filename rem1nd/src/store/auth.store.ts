@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { api } from "../api/axios";
 import { getToken, setToken, deleteToken } from "../utils/token";
+import { getExpoPushToken } from "../services/pushToken";
 import {
   login as loginApi,
   register as registerApi,
@@ -31,6 +32,17 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email, password) => {
     const data = await loginApi(email, password);
+
+    await setToken(data.token);
+
+    const pushToken = await getExpoPushToken();
+
+    if (pushToken) {
+      await api.post("/users/push-token", {
+        token: pushToken,
+      });
+    }
+
     set({
       user: data.user,
       isAuthenticated: true,
@@ -39,6 +51,17 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   register: async (email, password) => {
     const data = await registerApi(email, password);
+
+    await setToken(data.token);
+
+    const pushToken = await getExpoPushToken();
+
+    if (pushToken) {
+      await api.post("/users/push-token", {
+        token: pushToken,
+      });
+    }
+
     set({
       user: data.user,
       isAuthenticated: true,
@@ -47,6 +70,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     await logoutApi();
+    await deleteToken();
+
     set({
       user: null,
       isAuthenticated: false,
