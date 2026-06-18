@@ -1,15 +1,25 @@
 import { Router } from "express";
+
 import { authenticate } from "../middleware/auth.js";
+
+import { asyncHandler } from "../utils/async-handler.js";
+
 import { ReminderController } from "../controllers/reminder.controller.js";
 
 const router = Router();
+
 const controller = new ReminderController();
 
 router.use(authenticate);
-router.post("/", controller.create);
-router.get("/", controller.getAll);
-router.get("/:id", controller.getOne);
-router.patch("/:id", controller.update);
-router.delete("/:id", controller.delete);
+
+router.post("/", asyncHandler(controller.create.bind(controller)));
+
+router.get("/", asyncHandler(controller.getAll.bind(controller)));
+
+router.get("/:id", asyncHandler(controller.getOne.bind(controller)));
+
+router.patch("/:id", asyncHandler(controller.update.bind(controller)));
+
+router.delete("/:id", asyncHandler(controller.delete.bind(controller)));
 
 export default router;

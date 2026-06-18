@@ -1,11 +1,17 @@
 import "dotenv/config";
 import "./config/firebase.js";
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import authRoutes from "./routes/auth.routes.js";
-import reminderRoutes from "./routes/reminder.routes.js";
+
+import { env } from "./config/env.js";
+import { prisma } from "./config/prisma.js";
+
+import routes from "./routes/index.js";
+
+import { notFound } from "./middleware/not-found.js";
 import { errorHandler } from "./middleware/error-handler.js";
 
 const app = express();
@@ -15,19 +21,35 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 
-app.get("/health", (_, res) => {
+app.get("/api/v1/health", (_, res) => {
   res.status(200).json({
     success: true,
-    message: "Server running",
+    message: "OK",
   });
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api/reminders", reminderRoutes);
-
+app.use("/api/v1", routes);
+app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
+const PORT = env.PORT || 5000;
+
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+
+  prisma.$connect().then(() => {
+    console.log("Connected to database");
+  });
+});
+
+const signals = ["SIGTERM", "SIGINT", "SIGHUP"];
+
+signals.forEach((signal) => {
+  process.on(signal, async () => {
+    console.log(`Received ${signal}`);
+    server.close();
+    await prisma.$disconnect();
+    console.log("Server closed");
+    process.exit(0);
+  });
 });
