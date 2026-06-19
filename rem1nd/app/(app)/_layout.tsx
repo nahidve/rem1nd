@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function AppLayout() {
   return (
-    <Tabs>
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
         name="index"
         options={{

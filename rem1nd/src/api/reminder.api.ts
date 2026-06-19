@@ -35,3 +35,27 @@ export async function createReminder(data: {
 
   return reminder;
 }
+
+export async function getReminder(id: string) {
+  const res = await api.get(`/reminders/${id}`);
+  return res.data.data;
+}
+
+export async function updateReminder(
+  id: string,
+  data: Partial<{
+    title: string;
+    amount?: number;
+    category: string;
+    dueDate: string;
+    repeatType: "ONCE" | "MONTHLY" | "YEARLY";
+    isActive: boolean;
+  }>,
+) {
+  const res = await api.patch(`/reminders/${id}`, data);
+  return res.data.data;
+}
+
+export async function deleteReminder(id: string) {
+  await api.delete(`/reminders/${id}`);
+}

@@ -1,56 +1,96 @@
-import { useEffect, useState } from "react";
-import { View, Text, FlatList, Pressable } from "react-native";
 import {
-  getSubscriptions,
-  Subscription,
-} from "../../../src/api/subscription.api";
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 
+import {
+  useSubscriptions,
+  useDeleteSubscription,
+} from "../../../src/queries/subscriptions.query";
+
 export default function SubscriptionsScreen() {
-  const [items, setItems] = useState<Subscription[]>([]);
   const router = useRouter();
 
-  const load = async () => {
-    const data = await getSubscriptions();
-    setItems(data);
-  };
+  const { data, isLoading, error } = useSubscriptions();
+  const { mutate: deleteSubscription } = useDeleteSubscription();
 
-  useEffect(() => {
-    load();
-  }, []);
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Failed to load subscriptions</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={{ flex: 1, padding: 16, gap: 12 }}>
-      <Text style={{ fontSize: 22, fontWeight: "600" }}>Subscriptions</Text>
-
-      <Pressable
-        onPress={() => router.push("/(app)/subscriptions/create")}
-        style={{ padding: 10, backgroundColor: "black" }}
-      >
-        <Text style={{ color: "white", textAlign: "center" }}>
-          + Add Subscription
-        </Text>
-      </Pressable>
-
+    <View style={{ flex: 1, padding: 16 }}>
       <FlatList
-        data={items}
+        data={data || []}
         keyExtractor={(item) => item.id}
+        ListEmptyComponent={<Text>No subscriptions yet</Text>}
         renderItem={({ item }) => (
-          <View
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/subscriptions/[id]",
+                params: { id: item.id },
+              })
+            }
             style={{
               padding: 12,
               borderWidth: 1,
-              borderRadius: 8,
+              borderRadius: 10,
               marginBottom: 10,
             }}
           >
             <Text style={{ fontWeight: "600" }}>{item.name}</Text>
-            <Text>₹ {item.amount}</Text>
-            <Text>{item.billingType}</Text>
-            <Text>Renew: {item.renewalDate}</Text>
-          </View>
+
+            <Text>₹{item.amount}</Text>
+
+            <Pressable
+              onPress={() => deleteSubscription(item.id)}
+              style={{
+                marginTop: 8,
+                padding: 6,
+                backgroundColor: "red",
+                borderRadius: 6,
+                alignSelf: "flex-start",
+              }}
+            >
+              <Text style={{ color: "white" }}>Delete</Text>
+            </Pressable>
+          </Pressable>
         )}
       />
+
+      <Pressable
+        onPress={() => router.push("/subscriptions/create")}
+        style={{
+          position: "absolute",
+          right: 20,
+          bottom: 20,
+          width: 60,
+          height: 60,
+          borderRadius: 30,
+          backgroundColor: "black",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: "white", fontSize: 28 }}>+</Text>
+      </Pressable>
     </View>
   );
 }
