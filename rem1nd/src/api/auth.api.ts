@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithCredential,
+  signInAnonymously,
   signOut,
 } from "firebase/auth";
 import { auth } from "../config/firebase";
@@ -33,6 +34,14 @@ export async function logout() {
 export async function loginWithGoogle(idToken: string) {
   const credential = GoogleAuthProvider.credential(idToken);
   const userCred = await signInWithCredential(auth, credential);
+  const token = await userCred.user.getIdToken();
+  await setToken(token);
+  const res = await api.get("/auth/me");
+  return res.data;
+}
+
+export async function loginAsGuest() {
+  const userCred = await signInAnonymously(auth);
   const token = await userCred.user.getIdToken();
   await setToken(token);
   const res = await api.get("/auth/me");

@@ -5,7 +5,7 @@ import { useGoogleAuth } from "../../src/services/google.auth";
 import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
-  const { login, register } = useAuthStore();
+  const { login, register, guestLogin } = useAuthStore();
   const router = useRouter();
 
   const { promptAsync } = useGoogleAuth(() => {
@@ -73,6 +73,31 @@ export default function LoginScreen() {
       >
         <Text style={{ color: "white", textAlign: "center" }}>
           Continue with Google
+        </Text>
+      </Pressable>
+
+      <Pressable
+        onPress={async () => {
+          try {
+            await guestLogin();
+            router.replace("/(app)");
+          } catch (e: any) {
+            Alert.alert("Guest login failed", e.message);
+          }
+        }}
+        style={{
+          padding: 12,
+          backgroundColor: "#666",
+          borderRadius: 8,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+          }}
+        >
+          Continue as Guest
         </Text>
       </Pressable>
     </View>

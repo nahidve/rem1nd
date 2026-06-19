@@ -6,6 +6,7 @@ import {
   login as loginApi,
   register as registerApi,
   logout as logoutApi,
+  loginAsGuest,
 } from "../api/auth.api";
 
 type User = {
@@ -22,6 +23,7 @@ type AuthState = {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  guestLogin: () => Promise<void>;
   hydrate: () => Promise<void>;
 };
 
@@ -61,6 +63,15 @@ export const useAuthStore = create<AuthState>((set) => ({
         token: pushToken,
       });
     }
+
+    set({
+      user: data.user,
+      isAuthenticated: true,
+    });
+  },
+
+  guestLogin: async () => {
+    const data = await loginAsGuest();
 
     set({
       user: data.user,

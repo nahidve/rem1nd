@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { View, Text, FlatList } from "react-native";
 import { getDashboard } from "../../src/api/analytics.api";
+import { useAuthStore } from "../../src/store/auth.store";
 
 export default function Home() {
+  const { user } = useAuthStore();
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,11 +25,18 @@ export default function Home() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [user]);
 
   if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 16,
+        }}
+      >
         <Text style={{ color: "red", textAlign: "center" }}>{error}</Text>
       </View>
     );
@@ -43,9 +52,7 @@ export default function Home() {
 
   return (
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
-      <Text style={{ fontSize: 22, fontWeight: "600" }}>
-        Dashboard
-      </Text>
+      <Text style={{ fontSize: 22, fontWeight: "600" }}>Dashboard</Text>
 
       <Text>Total Monthly Spend: ₹{data.totalMonthlySpend}</Text>
 
