@@ -51,6 +51,22 @@ export default function ReminderDetails() {
       <Text>Status: {item.isActive ? "Active" : "Inactive"}</Text>
 
       <Pressable
+        onPress={() =>
+          router.push({
+            pathname: "/(app)/reminders/edit/[id]",
+            params: { id },
+          })
+        }
+        style={{
+          padding: 12,
+          backgroundColor: "blue",
+          borderRadius: 8,
+        }}
+      >
+        <Text style={{ color: "white", textAlign: "center" }}>Edit</Text>
+      </Pressable>
+
+      <Pressable
         onPress={handleDelete}
         style={{
           padding: 12,
