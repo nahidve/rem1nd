@@ -7,6 +7,8 @@ import {
   updateSubscriptionSchema,
 } from "../validators/subscription.validator.js";
 
+import { ApiResponse } from "../utils/api-response.js";
+
 const service = new SubscriptionService();
 
 export class SubscriptionController {
@@ -14,10 +16,12 @@ export class SubscriptionController {
     const parsed = createSubscriptionSchema.safeParse(req.body);
 
     if (!parsed.success) {
-      return res.status(400).json({
-        success: false,
-        errors: parsed.error.flatten(),
-      });
+      return ApiResponse.error(
+        res,
+        "Validation failed",
+        400,
+        parsed.error.flatten()
+      );
     }
 
     const subscription = await service.createSubscription(
@@ -26,76 +30,88 @@ export class SubscriptionController {
       parsed.data.amount,
       parsed.data.billingType,
       new Date(parsed.data.renewalDate),
-      parsed.data.autoPay,
+      parsed.data.autoPay
     );
 
-    return res.status(201).json({
-      success: true,
-      data: subscription,
-    });
+    return ApiResponse.success(
+      res,
+      subscription,
+      "Subscription created",
+      201
+    );
   }
 
   async getAll(req: Request, res: Response) {
-    const subscriptions = await service.getUserSubscriptions(
-      req.user!.dbUserId!,
-    );
+    const subscriptions =
+      await service.getUserSubscriptions(
+        req.user!.dbUserId!
+      );
 
-    return res.status(200).json({
-      success: true,
-      data: subscriptions,
-    });
+    return ApiResponse.success(
+      res,
+      subscriptions
+    );
   }
 
   async getOne(req: Request, res: Response) {
-    const subscription = await service.getSubscription(
-      String(req.params.id),
-      req.user!.dbUserId!,
-    );
+    const subscription =
+      await service.getSubscription(
+        String(req.params.id),
+        req.user!.dbUserId!
+      );
 
     if (!subscription) {
-      return res.status(404).json({
-        success: false,
-        message: "Subscription not found",
-      });
+      return ApiResponse.error(
+        res,
+        "Subscription not found",
+        404
+      );
     }
 
-    return res.status(200).json({
-      success: true,
-      data: subscription,
-    });
+    return ApiResponse.success(
+      res,
+      subscription
+    );
   }
 
   async update(req: Request, res: Response) {
-    const parsed = updateSubscriptionSchema.safeParse(req.body);
-
-    if (!parsed.success) {
-      return res.status(400).json({
-        success: false,
-        errors: parsed.error.flatten(),
-      });
-    }
-
-    const subscription = await service.updateSubscription(
-      String(req.params.id),
-      req.user!.dbUserId!,
-      parsed.data,
+    const parsed = updateSubscriptionSchema.safeParse(
+      req.body
     );
 
-    return res.status(200).json({
-      success: true,
-      data: subscription,
-    });
+    if (!parsed.success) {
+      return ApiResponse.error(
+        res,
+        "Validation failed",
+        400,
+        parsed.error.flatten()
+      );
+    }
+
+    const subscription =
+      await service.updateSubscription(
+        String(req.params.id),
+        req.user!.dbUserId!,
+        parsed.data
+      );
+
+    return ApiResponse.success(
+      res,
+      subscription,
+      "Subscription updated"
+    );
   }
 
   async delete(req: Request, res: Response) {
     await service.deleteSubscription(
       String(req.params.id),
-      req.user!.dbUserId!,
+      req.user!.dbUserId!
     );
 
-    return res.status(200).json({
-      success: true,
-      message: "Subscription deleted",
-    });
+    return ApiResponse.success(
+      res,
+      null,
+      "Subscription deleted"
+    );
   }
 }

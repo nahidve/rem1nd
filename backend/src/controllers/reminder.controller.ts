@@ -4,97 +4,90 @@ import {
   createReminderSchema,
   updateReminderSchema,
 } from "../validators/reminder.validator.js";
+import { ApiResponse } from "../utils/api-response.js";
 
 const service = new ReminderService();
 
 export class ReminderController {
-  async create(req: Request, res: Response): Promise<void> {
+  async create(req: Request, res: Response) {
     const parsed = createReminderSchema.safeParse(req.body);
-
     if (!parsed.success) {
-      res.status(400).json({
-        success: false,
-        errors: parsed.error.flatten(),
-      });
-
-      return;
+      return ApiResponse.error(
+        res,
+        "Validation failed",
+        400,
+        parsed.error.flatten()
+      );
     }
-
     const reminder = await service.createReminder(
       req.user!.dbUserId!,
       parsed.data.title,
       parsed.data.amount ?? null,
       parsed.data.category,
       new Date(parsed.data.dueDate),
-      parsed.data.repeatType,
+      parsed.data.repeatType
     );
-
-    res.status(201).json({
-      success: true,
-      data: reminder,
-    });
+    return ApiResponse.success(
+      res,
+      reminder,
+      "Reminder created",
+      201
+    );
   }
 
-  async getAll(req: Request, res: Response): Promise<void> {
-    const reminders = await service.getUserReminders(req.user!.dbUserId!);
-
-    res.status(200).json({
-      success: true,
-      data: reminders,
-    });
+  async getAll(req: Request, res: Response) {
+    const reminders = await service.getUserReminders(
+      req.user!.dbUserId!
+    );
+    return ApiResponse.success(res, reminders);
   }
 
-  async getOne(req: Request, res: Response): Promise<void> {
+  async getOne(req: Request, res: Response) {
     const reminder = await service.getReminder(
       String(req.params.id),
-      req.user!.dbUserId!,
+      req.user!.dbUserId!
     );
-
     if (!reminder) {
-      res.status(404).json({
-        success: false,
-        message: "Reminder not found",
-      });
-
-      return;
+      return ApiResponse.error(
+        res,
+        "Reminder not found",
+        404
+      );
     }
-
-    res.status(200).json({
-      success: true,
-      data: reminder,
-    });
+    return ApiResponse.success(res, reminder);
   }
 
-  async update(req: Request, res: Response): Promise<void> {
+  async update(req: Request, res: Response) {
     const parsed = updateReminderSchema.safeParse(req.body);
-
     if (!parsed.success) {
-      res.status(400).json({
-        success: false,
-        errors: parsed.error.flatten(),
-      });
-
-      return;
+      return ApiResponse.error(
+        res,
+        "Validation failed",
+        400,
+        parsed.error.flatten()
+      );
     }
-
     const reminder = await service.updateReminder(
       String(req.params.id),
       req.user!.dbUserId!,
-      parsed.data,
+      parsed.data
     );
-
-    res.status(200).json({
-      success: true,
-      data: reminder,
-    });
+    return ApiResponse.success(
+      res,
+      reminder,
+      "Reminder updated"
+    );
   }
 
-  async delete(req: Request, res: Response): Promise<void> {
-    await service.deleteReminder(String(req.params.id), req.user!.dbUserId!);
-
-    res.status(200).json({
-      success: true,
-      message: "Reminder deleted",
-    });
+  async delete(req: Request, res: Response) {
+    await service.deleteReminder(
+      String(req.params.id),
+      req.user!.dbUserId!
+    );
+    return ApiResponse.success(
+      res,
+      null,
+      "Reminder deleted"
+    );
   }
 }

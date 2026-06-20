@@ -8,11 +8,10 @@ import morgan from "morgan";
 
 import { env } from "./config/env.js";
 import { prisma } from "./config/prisma.js";
-
+import routes from "./routes/index.js";
 import { processDueReminders } from "./jobs/reminder.job.js";
 
-import routes from "./routes/index.js";
-
+import { ApiResponse } from "./utils/api-response.js";
 import { notFound } from "./middleware/not-found.js";
 import { errorHandler } from "./middleware/error-handler.js";
 
@@ -24,10 +23,11 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 app.get("/api/v1/health", (_, res) => {
-  res.status(200).json({
-    success: true,
-    message: "OK",
-  });
+  return ApiResponse.success(
+    res,
+    null,
+    "OK"
+  );
 });
 
 app.use("/api/v1", routes);

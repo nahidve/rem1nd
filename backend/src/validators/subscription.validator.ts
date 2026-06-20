@@ -3,13 +3,11 @@ import { z } from "zod";
 
 export const createSubscriptionSchema = z.object({
   name: z.string().min(1).max(100),
-
   amount: z.number().positive(),
-
   billingType: z.nativeEnum(BillingType),
-  renewalDate: z.iso.datetime(),
-
+  renewalDate: z.string().datetime(),
   autoPay: z.boolean().default(false),
 });
 
-export const updateSubscriptionSchema = createSubscriptionSchema.partial();
+export const updateSubscriptionSchema =
+  createSubscriptionSchema.partial();
