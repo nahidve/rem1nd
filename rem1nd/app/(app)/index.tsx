@@ -7,6 +7,7 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useDashboard } from "../../src/queries/dashboard.query";
 import { getDashboard } from "../../src/api/analytics.api";
@@ -64,11 +65,12 @@ export default function Home() {
   const symbol = getCurrencySymbol(data.homeCurrency);
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        padding: 16,
-      }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
+      <ScrollView
+        contentContainerStyle={{
+          padding: 16,
+        }}
+      >
       <Text
         style={{
           fontSize: 28,
@@ -374,6 +376,7 @@ export default function Home() {
           </View>
         )}
       />
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

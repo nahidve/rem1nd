@@ -1,4 +1,5 @@
 import { View, Text, Pressable, Alert, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "../../src/store/auth.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "../../src/api/axios";
@@ -59,11 +60,13 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         padding: 16,
+        backgroundColor: "#fff",
       }}
+      edges={["top", "left", "right"]}
     >
       <Text
         style={{
@@ -214,6 +217,6 @@ export default function SettingsScreen() {
           Logout
         </Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text, FlatList, ActivityIndicator, Pressable, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { getSubscriptions } from "../../src/api/subscription.api";
 import { getReminders } from "../../src/api/reminder.api";
 import { api } from "../../src/api/axios";
@@ -135,7 +136,7 @@ export default function CalendarScreen() {
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f9f9f9" }} edges={["top", "left", "right"]}>
       {/* Top Segmented Tabs */}
       <View style={{ flexDirection: "row", padding: 16, backgroundColor: "white", borderBottomWidth: 1, borderColor: "#eee", gap: 10 }}>
         <Pressable
@@ -386,6 +387,6 @@ export default function CalendarScreen() {
           )}
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

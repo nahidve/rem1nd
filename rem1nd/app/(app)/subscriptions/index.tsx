@@ -8,6 +8,7 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 import {
@@ -62,8 +63,8 @@ export default function SubscriptionsScreen() {
   });
 
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: "#f9f9f9" }}>
-      <Text style={{ fontSize: 24, fontWeight: "700", marginBottom: 12, color: "#111" }}>
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 16, backgroundColor: "#f9f9f9" }} edges={["top", "left", "right"]}>
+      <Text style={{ fontSize: 24, fontWeight: "700", marginBottom: 12, color: "#111", marginTop: 8 }}>
         Subscriptions
       </Text>
 
@@ -210,6 +211,6 @@ export default function SubscriptionsScreen() {
       >
         <Text style={{ color: "white", fontSize: 28, fontWeight: "300" }}>+</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }

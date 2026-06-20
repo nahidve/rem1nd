@@ -8,6 +8,7 @@ import {
    ActivityIndicator,
    ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { api } from "../../../../src/api/axios";
@@ -53,7 +54,7 @@ export default function EditReminder() {
       setAmount(data.amount ? String(data.amount) : "");
       setCategory(data.category || "Other");
       setCurrency(data.currency || "INR");
-      setDueDate(data.dueDate);
+      setDueDate(data.dueDate ? data.dueDate.split("T")[0] : "");
     } catch (e: any) {
       Alert.alert("Error", e.message);
     } finally {
@@ -62,6 +63,10 @@ export default function EditReminder() {
   };
 
   const handleUpdate = async () => {
+    if (!dueDate || isNaN(Date.parse(dueDate))) {
+      Alert.alert("Error", "Please enter a valid date in YYYY-MM-DD format");
+      return;
+    }
     try {
       await api.put(`/reminders/${id}`, {
         title,
@@ -94,7 +99,8 @@ export default function EditReminder() {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
       <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 8 }}>
         Edit Reminder
       </Text>
@@ -197,6 +203,7 @@ export default function EditReminder() {
           Update
         </Text>
       </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

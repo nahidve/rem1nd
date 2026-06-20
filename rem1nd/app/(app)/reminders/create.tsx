@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { View, TextInput, Pressable, Text, Alert, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 import { api } from "../../../src/api/axios";
@@ -31,6 +32,10 @@ export default function CreateReminder() {
   const [dueDate, setDueDate] = useState("");
 
   const handleCreate = async () => {
+    if (!dueDate || isNaN(Date.parse(dueDate))) {
+      Alert.alert("Error", "Please enter a valid date in YYYY-MM-DD format");
+      return;
+    }
     try {
       await api.post("/reminders", {
         title,
@@ -51,7 +56,8 @@ export default function CreateReminder() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
       <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 8 }}>
         New Reminder
       </Text>
@@ -154,6 +160,7 @@ export default function CreateReminder() {
           Create
         </Text>
       </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

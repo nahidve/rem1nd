@@ -10,74 +10,51 @@ datasource db {
 model User {
   id          String @id @default(cuid())
   firebaseUid String @unique
-
   email String? @unique
   name  String?
-
   pushToken String? @unique
-
   isPremium    Boolean   @default(false)
   premiumUntil DateTime?
-
   homeCurrency String    @default("INR")
-
   reminders     Reminder[]
   subscriptions Subscription[]
   payments      PaymentHistory[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@index([firebaseUid])
 }
 
 model Reminder {
   id String @id @default(cuid())
-
   title    String
   amount   Decimal?
   category String
   currency String   @default("INR")
-
   dueDate DateTime
-
   repeatType RepeatType
-
   isActive Boolean @default(true)
-
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@index([userId])
   @@index([dueDate])
 }
 
 model Subscription {
   id String @id @default(cuid())
-
   name String
-
   amount Decimal
   currency String   @default("INR")
   category String   @default("Other")
-
   billingType BillingType
-
   renewalDate DateTime
-
   autoPay Boolean @default(false)
-
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   payments      PaymentHistory[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@index([userId])
   @@index([renewalDate])
 }
@@ -103,7 +80,6 @@ model PaymentHistory {
   currency       String
   paymentDate    DateTime
   createdAt      DateTime     @default(now())
-
   @@index([userId])
   @@index([subscriptionId])
 }

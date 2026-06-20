@@ -7,7 +7,9 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Switch,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { api } from "../../../../src/api/axios";
@@ -38,6 +40,8 @@ export default function EditSubscription() {
   const [renewalDate, setRenewalDate] = useState("");
   const [currency, setCurrency] = useState("INR");
   const [category, setCategory] = useState("Other");
+  const [billingType, setBillingType] = useState<"MONTHLY" | "YEARLY">("MONTHLY");
+  const [autoPay, setAutoPay] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -51,9 +55,11 @@ export default function EditSubscription() {
 
       setName(data.name);
       setAmount(String(data.amount));
-      setRenewalDate(data.renewalDate);
+      setRenewalDate(data.renewalDate ? data.renewalDate.split("T")[0] : "");
       setCurrency(data.currency || "INR");
       setCategory(data.category || "Other");
+      setBillingType(data.billingType || "MONTHLY");
+      setAutoPay(!!data.autoPay);
     } catch (e: any) {
       Alert.alert("Error", e.message);
     } finally {
@@ -62,13 +68,27 @@ export default function EditSubscription() {
   };
 
   const handleUpdate = async () => {
+    if (!name.trim()) {
+      Alert.alert("Error", "Please enter a subscription name");
+      return;
+    }
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      Alert.alert("Error", "Please enter a valid positive amount");
+      return;
+    }
+    if (!renewalDate || isNaN(Date.parse(renewalDate))) {
+      Alert.alert("Error", "Please enter a valid date in YYYY-MM-DD format");
+      return;
+    }
     try {
       await api.put(`/subscriptions/${id}`, {
         name,
         amount: Number(amount),
         currency,
         category,
+        billingType,
         renewalDate: new Date(renewalDate).toISOString(),
+        autoPay,
       });
 
       await qc.invalidateQueries({ queryKey: ["subscriptions"] });
@@ -94,7 +114,8 @@ export default function EditSubscription() {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
       <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 8 }}>
         Edit Subscription
       </Text>
@@ -189,6 +210,49 @@ export default function EditSubscription() {
         />
       </View>
 
+      <View style={{ gap: 6 }}>
+        <Text style={{ fontWeight: "600", fontSize: 14 }}>Billing Cycle</Text>
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          {["MONTHLY", "YEARLY"].map((type) => (
+            <Pressable
+              key={type}
+              onPress={() => setBillingType(type as any)}
+              style={{
+                flex: 1,
+                padding: 10,
+                borderWidth: 1,
+                borderRadius: 8,
+                borderColor: billingType === type ? "black" : "#ccc",
+                backgroundColor: billingType === type ? "black" : "white",
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontWeight: "600",
+                  color: billingType === type ? "white" : "black",
+                }}
+              >
+                {type === "MONTHLY" ? "Monthly" : "Yearly"}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 8 }}>
+        <View>
+          <Text style={{ fontWeight: "600", fontSize: 14 }}>Auto Pay Enabled</Text>
+          <Text style={{ fontSize: 11, opacity: 0.6 }}>Automatically records payments on renewal dates</Text>
+        </View>
+        <Switch
+          value={autoPay}
+          onValueChange={setAutoPay}
+          trackColor={{ false: "#ccc", true: "black" }}
+          thumbColor={autoPay ? "white" : "#f4f3f4"}
+        />
+      </View>
+
       <Pressable
         onPress={handleUpdate}
         style={{ padding: 14, backgroundColor: "black", borderRadius: 8, marginTop: 12 }}
@@ -197,6 +261,7 @@ export default function EditSubscription() {
           Update
         </Text>
       </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
