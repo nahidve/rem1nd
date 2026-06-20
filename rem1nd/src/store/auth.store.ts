@@ -13,6 +13,7 @@ type User = {
   uid: string;
   email?: string;
   dbUserId: string;
+  homeCurrency?: string;
 };
 
 type AuthState = {
@@ -25,12 +26,19 @@ type AuthState = {
   logout: () => Promise<void>;
   guestLogin: () => Promise<void>;
   hydrate: () => Promise<void>;
+  updateHomeCurrency: (currency: string) => void;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: true,
   isAuthenticated: false,
+
+  updateHomeCurrency: (currency) => {
+    set((state) => ({
+      user: state.user ? { ...state.user, homeCurrency: currency } : null,
+    }));
+  },
 
   login: async (email, password) => {
     const data = await loginApi(email, password);

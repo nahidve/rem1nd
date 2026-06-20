@@ -20,4 +20,23 @@ router.post("/push-token", authenticate, async (req, res) => {
     return ApiResponse.success(res, null, "Push token saved");
 });
 
+router.put("/currency", authenticate, async (req, res) => {
+    const { currency } = req.body;
+
+    if (!["INR", "USD", "EUR", "GBP"].includes(currency)) {
+        return ApiResponse.error(res, "Invalid currency", 400);
+    }
+
+    await prisma.user.update({
+        where: {
+            id: req.user!.dbUserId,
+        },
+        data: {
+            homeCurrency: currency,
+        } as any,
+    });
+
+    return ApiResponse.success(res, null, "Preferred currency updated successfully");
+});
+
 export default router;

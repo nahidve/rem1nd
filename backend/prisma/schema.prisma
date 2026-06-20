@@ -23,6 +23,7 @@ model User {
 
   reminders     Reminder[]
   subscriptions Subscription[]
+  payments      PaymentHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -72,6 +73,8 @@ model Subscription {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  payments      PaymentHistory[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -88,4 +91,19 @@ enum RepeatType {
 enum BillingType {
   MONTHLY
   YEARLY
+}
+
+model PaymentHistory {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount         Decimal
+  currency       String
+  paymentDate    DateTime
+  createdAt      DateTime     @default(now())
+
+  @@index([userId])
+  @@index([subscriptionId])
 }

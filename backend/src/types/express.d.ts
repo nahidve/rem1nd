@@ -8,6 +8,7 @@ declare global {
         email?: string;
         name?: string;
         dbUserId?: string;
+        homeCurrency?: string;
       };
     }
   }

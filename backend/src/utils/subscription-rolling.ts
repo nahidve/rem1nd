@@ -19,6 +19,16 @@ export async function rollUserSubscriptions(userId: string) {
 
     // Iteratively roll forward until the renewal date is in the future
     while (nextRenewal <= now) {
+      await (prisma as any).paymentHistory.create({
+        data: {
+          subscriptionId: sub.id,
+          userId,
+          amount: sub.amount,
+          currency: (sub as any).currency || "INR",
+          paymentDate: new Date(nextRenewal),
+        } as any,
+      });
+
       if (sub.billingType === "MONTHLY") {
         nextRenewal.setMonth(nextRenewal.getMonth() + 1);
       } else if (sub.billingType === "YEARLY") {

@@ -102,4 +102,23 @@ router.get("/dashboard", authenticate, async (req, res) => {
   });
 });
 
+router.get("/history", authenticate, async (req, res) => {
+  const userId = req.user!.dbUserId;
+
+  const history = await (prisma as any).paymentHistory.findMany({
+    where: { userId },
+    include: {
+      subscription: {
+        select: {
+          name: true,
+          category: true,
+        },
+      },
+    },
+    orderBy: { paymentDate: "desc" },
+  });
+
+  return ApiResponse.success(res, history);
+});
+
 export default router;

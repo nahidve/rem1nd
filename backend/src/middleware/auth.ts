@@ -32,6 +32,7 @@ export async function authenticate(
       email: decoded.email,
       name: decoded.name,
       dbUserId: user.id,
+      homeCurrency: (user as any).homeCurrency,
     };
 
     next();
