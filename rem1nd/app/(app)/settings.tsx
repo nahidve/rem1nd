@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Alert } from "react-native";
+import { View, Text, Pressable, Alert, Platform } from "react-native";
 import { useAuthStore } from "../../src/store/auth.store";
 
 export default function SettingsScreen() {
@@ -7,19 +7,32 @@ export default function SettingsScreen() {
   const isGuest = user?.uid === "guest";
 
   const handleLogout = async () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          await logout();
+    const performLogout = async () => {
+      try {
+        await logout();
+      } catch (e) {
+        console.error("Logout failed", e);
+      }
+    };
+
+    if (Platform.OS === "web") {
+      const confirmLogout = window.confirm("Are you sure you want to logout?");
+      if (confirmLogout) {
+        await performLogout();
+      }
+    } else {
+      Alert.alert("Logout", "Are you sure you want to logout?", [
+        {
+          text: "Cancel",
+          style: "cancel",
         },
-      },
-    ]);
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: performLogout,
+        },
+      ]);
+    }
   };
 
   return (

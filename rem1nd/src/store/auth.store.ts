@@ -35,38 +35,42 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email, password) => {
     const data = await loginApi(email, password);
 
-    await setToken(data.token);
-
-    const pushToken = await getExpoPushToken();
-
-    if (pushToken) {
-      await api.post("/users/push-token", {
-        token: pushToken,
-      });
+    try {
+      const pushToken = await getExpoPushToken();
+      if (pushToken) {
+        await api.post("/users/push-token", {
+          token: pushToken,
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to register push token:", e);
     }
 
     set({
-      user: data.user,
+      user: data.data,
       isAuthenticated: true,
+      loading: false,
     });
   },
 
   register: async (email, password) => {
     const data = await registerApi(email, password);
 
-    await setToken(data.token);
-
-    const pushToken = await getExpoPushToken();
-
-    if (pushToken) {
-      await api.post("/users/push-token", {
-        token: pushToken,
-      });
+    try {
+      const pushToken = await getExpoPushToken();
+      if (pushToken) {
+        await api.post("/users/push-token", {
+          token: pushToken,
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to register push token:", e);
     }
 
     set({
-      user: data.user,
+      user: data.data,
       isAuthenticated: true,
+      loading: false,
     });
   },
 
@@ -74,8 +78,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     const data = await loginAsGuest();
 
     set({
-      user: data.user,
+      user: data.data,
       isAuthenticated: true,
+      loading: false,
     });
   },
 
@@ -86,6 +91,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({
       user: null,
       isAuthenticated: false,
+      loading: false,
     });
   },
 
@@ -105,7 +111,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const res = await api.get("/auth/me");
 
       set({
-        user: res.data.user,
+        user: res.data.data,
         isAuthenticated: true,
         loading: false,
       });

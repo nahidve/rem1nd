@@ -19,6 +19,8 @@ model User {
   isPremium    Boolean   @default(false)
   premiumUntil DateTime?
 
+  homeCurrency String    @default("INR")
+
   reminders     Reminder[]
   subscriptions Subscription[]
 
@@ -34,6 +36,7 @@ model Reminder {
   title    String
   amount   Decimal?
   category String
+  currency String   @default("INR")
 
   dueDate DateTime
 
@@ -57,6 +60,8 @@ model Subscription {
   name String
 
   amount Decimal
+  currency String   @default("INR")
+  category String   @default("Other")
 
   billingType BillingType
 

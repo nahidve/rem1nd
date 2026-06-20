@@ -7,11 +7,14 @@ import {
     createSubscriptionSchema,
     updateSubscriptionSchema,
 } from "../validators/subscription.validator.js";
+import { rollUserSubscriptions } from "../utils/subscription-rolling.js";
 
 const router = Router();
 
 router.get("/", authenticate, async (req, res) => {
     const userId = req.user!.dbUserId;
+
+    await rollUserSubscriptions(userId!);
 
     const data = await prisma.subscription.findMany({
         where: { userId },
@@ -26,6 +29,8 @@ router.get("/:id", authenticate, async (req, res) => {
     const id = Array.isArray(req.params.id)
         ? req.params.id[0]
         : req.params.id;
+
+    await rollUserSubscriptions(userId!);
 
     const sub = await prisma.subscription.findFirst({
         where: { id, userId },
@@ -45,19 +50,21 @@ router.get("/:id", authenticate, async (req, res) => {
 router.post("/", authenticate, validate({ body: createSubscriptionSchema }), async (req, res) => {
     const userId = req.user!.dbUserId;
 
-    const { name, amount, billingType, renewalDate, autoPay } = req.body;
+    const { name, amount, billingType, renewalDate, autoPay, currency, category } = req.body;
 
     const sub = await prisma.subscription.create({
         data: {
             name,
             amount,
+            currency,
+            category,
             billingType,
             renewalDate: new Date(renewalDate),
             autoPay,
             user: {
                 connect: { id: userId },
             },
-        },
+        } as any,
     });
 
     return ApiResponse.success(

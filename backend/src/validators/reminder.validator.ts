@@ -5,6 +5,7 @@ export const createReminderSchema = z.object({
   title: z.string().min(1).max(100),
   amount: z.number().optional(),
   category: z.string().min(1),
+  currency: z.enum(["INR", "USD", "EUR", "GBP"]).default("INR"),
   dueDate: z.string().datetime(),
   repeatType: z.nativeEnum(RepeatType),
 });

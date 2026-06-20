@@ -53,19 +53,20 @@ router.get("/:id", authenticate, async (req, res) => {
  */
 router.post("/", authenticate, validate({ body: createReminderSchema }), async (req, res) => {
     const userId = req.user!.dbUserId;
-    const { title, amount, category, dueDate, repeatType } = req.body;
+    const { title, amount, category, dueDate, repeatType, currency } = req.body;
 
     const reminder = await prisma.reminder.create({
         data: {
             title,
             amount,
             category,
+            currency,
             dueDate: new Date(dueDate),
             repeatType,
             user: {
                 connect: { id: userId },
             },
-        },
+        } as any,
     });
 
     return ApiResponse.success(
