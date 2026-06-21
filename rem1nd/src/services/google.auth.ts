@@ -7,9 +7,20 @@ import { setToken } from "../utils/token";
 
 WebBrowser.maybeCompleteAuthSession();
 
+import * as AuthSession from "expo-auth-session";
+import { Platform } from "react-native";
+
 export function useGoogleAuth(onSuccess: () => void) {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID!,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID!,
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID!,
+    redirectUri: Platform.select({
+      android: "com.nahhid.rem1nd:/oauth2redirect",
+      default: AuthSession.makeRedirectUri({
+        scheme: "rem1nd",
+        path: "oauth2redirect",
+      }),
+    }),
   });
 
   useEffect(() => {

@@ -20,7 +20,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.nahidve.rem1nd"
+      "package": "com.nahhid.rem1nd",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",

@@ -124,6 +124,7 @@ export default function Home() {
             <Text style={{ fontSize: 18, fontWeight: "700", color: "#1c1917" }}>{displayName}</Text>
           </View>
           <Pressable
+
             onPress={handlePlusPress}
             style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 1, borderColor: "#e5e5e5", backgroundColor: "white", justifyContent: "center", alignItems: "center" }}
           >
