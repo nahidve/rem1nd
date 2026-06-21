@@ -12,7 +12,6 @@ import {
 type User = {
   uid: string;
   email?: string;
-  name?: string;
   dbUserId: string;
   homeCurrency?: string;
 };

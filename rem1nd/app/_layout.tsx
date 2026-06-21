@@ -4,6 +4,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from "../src/store/auth.store";
 import { ActivityIndicator, View } from "react-native";
 
+import { registerForPushNotificationsAsync } from "../src/config/notifications";
+import { getExpoPushToken } from "../src/services/pushToken";
+import { api } from "../src/api/axios";
+
 const queryClient = new QueryClient();
 
 function InitialLayout() {
@@ -13,7 +17,23 @@ function InitialLayout() {
 
   useEffect(() => {
     hydrate();
+    registerForPushNotificationsAsync();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      (async () => {
+        try {
+          const token = await getExpoPushToken();
+          if (token) {
+            await api.post("/users/push-token", { token });
+          }
+        } catch (err) {
+          console.error("Failed to register/upload push token on startup", err);
+        }
+      })();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (loading) return;

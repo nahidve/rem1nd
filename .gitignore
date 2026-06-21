@@ -80,3 +80,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Firebase Private Keys
+firebase_service_account_key.json
+

@@ -58,108 +58,108 @@ export default function CreateReminder() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-      <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 8 }}>
-        New Reminder
-      </Text>
-
-      <View style={{ gap: 6 }}>
-        <Text style={{ fontWeight: "600", fontSize: 14 }}>Reminder Title</Text>
-        <TextInput
-          placeholder="e.g. Pay electricity bill"
-          value={title}
-          onChangeText={setTitle}
-          style={{ borderWidth: 1, padding: 12, borderRadius: 8, borderColor: "#ccc" }}
-        />
-      </View>
-
-      <View style={{ gap: 6 }}>
-        <Text style={{ fontWeight: "600", fontSize: 14 }}>Amount (Optional)</Text>
-        <TextInput
-          placeholder="0.00"
-          value={amount}
-          onChangeText={setAmount}
-          keyboardType="numeric"
-          style={{ borderWidth: 1, padding: 12, borderRadius: 8, borderColor: "#ccc" }}
-        />
-      </View>
-
-      <View style={{ gap: 6 }}>
-        <Text style={{ fontWeight: "600", fontSize: 14 }}>Currency</Text>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          {CURRENCIES.map((c) => (
-            <Pressable
-              key={c.code}
-              onPress={() => setCurrency(c.code)}
-              style={{
-                flex: 1,
-                padding: 10,
-                borderWidth: 1,
-                borderRadius: 8,
-                borderColor: currency === c.code ? "black" : "#ccc",
-                backgroundColor: currency === c.code ? "black" : "white",
-              }}
-            >
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontWeight: "600",
-                  color: currency === c.code ? "white" : "black",
-                }}
-              >
-                {c.symbol} {c.code}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      </View>
-
-      <View style={{ gap: 6 }}>
-        <Text style={{ fontWeight: "600", fontSize: 14 }}>Category</Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-          {CATEGORIES.map((cat) => (
-            <Pressable
-              key={cat.name}
-              onPress={() => setCategory(cat.name)}
-              style={{
-                paddingVertical: 8,
-                paddingHorizontal: 12,
-                borderWidth: 1,
-                borderRadius: 20,
-                borderColor: category === cat.name ? "black" : "#ccc",
-                backgroundColor: category === cat.name ? "black" : "white",
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: "500",
-                  color: category === cat.name ? "white" : "black",
-                }}
-              >
-                {cat.icon} {cat.name}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      </View>
-
-      <View style={{ gap: 6 }}>
-        <Text style={{ fontWeight: "600", fontSize: 14 }}>Due Date</Text>
-        <TextInput
-          placeholder="YYYY-MM-DD HH:mm"
-          value={dueDate}
-          onChangeText={setDueDate}
-          style={{ borderWidth: 1, padding: 12, borderRadius: 8, borderColor: "#ccc" }}
-        />
-      </View>
-
-      <Pressable
-        onPress={handleCreate}
-        style={{ padding: 14, backgroundColor: "black", borderRadius: 8, marginTop: 12 }}
-      >
-        <Text style={{ color: "white", textAlign: "center", fontWeight: "600", fontSize: 16 }}>
-          Create
+        <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 8 }}>
+          New Reminder
         </Text>
-      </Pressable>
+
+        <View style={{ gap: 6 }}>
+          <Text style={{ fontWeight: "600", fontSize: 14 }}>Reminder Title</Text>
+          <TextInput
+            placeholder="e.g. Pay electricity bill"
+            value={title}
+            onChangeText={setTitle}
+            style={{ borderWidth: 1, padding: 12, borderRadius: 8, borderColor: "#ccc" }}
+          />
+        </View>
+
+        <View style={{ gap: 6 }}>
+          <Text style={{ fontWeight: "600", fontSize: 14 }}>Amount (Optional)</Text>
+          <TextInput
+            placeholder="0.00"
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="numeric"
+            style={{ borderWidth: 1, padding: 12, borderRadius: 8, borderColor: "#ccc" }}
+          />
+        </View>
+
+        <View style={{ gap: 6 }}>
+          <Text style={{ fontWeight: "600", fontSize: 14 }}>Currency</Text>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            {CURRENCIES.map((c) => (
+              <Pressable
+                key={c.code}
+                onPress={() => setCurrency(c.code)}
+                style={{
+                  flex: 1,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderRadius: 8,
+                  borderColor: currency === c.code ? "black" : "#ccc",
+                  backgroundColor: currency === c.code ? "black" : "white",
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "600",
+                    color: currency === c.code ? "white" : "black",
+                  }}
+                >
+                  {c.symbol} {c.code}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        <View style={{ gap: 6 }}>
+          <Text style={{ fontWeight: "600", fontSize: 14 }}>Category</Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+            {CATEGORIES.map((cat) => (
+              <Pressable
+                key={cat.name}
+                onPress={() => setCategory(cat.name)}
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  borderWidth: 1,
+                  borderRadius: 20,
+                  borderColor: category === cat.name ? "black" : "#ccc",
+                  backgroundColor: category === cat.name ? "black" : "white",
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "500",
+                    color: category === cat.name ? "white" : "black",
+                  }}
+                >
+                  {cat.icon} {cat.name}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        <View style={{ gap: 6 }}>
+          <Text style={{ fontWeight: "600", fontSize: 14 }}>Due Date</Text>
+          <TextInput
+            placeholder="YYYY-MM-DD HH:mm"
+            value={dueDate}
+            onChangeText={setDueDate}
+            style={{ borderWidth: 1, padding: 12, borderRadius: 8, borderColor: "#ccc" }}
+          />
+        </View>
+
+        <Pressable
+          onPress={handleCreate}
+          style={{ padding: 14, backgroundColor: "black", borderRadius: 8, marginTop: 12 }}
+        >
+          <Text style={{ color: "white", textAlign: "center", fontWeight: "600", fontSize: 16 }}>
+            Create
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
