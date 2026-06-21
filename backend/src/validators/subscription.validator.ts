@@ -13,3 +13,17 @@ export const createSubscriptionSchema = z.object({
 
 export const updateSubscriptionSchema =
   createSubscriptionSchema.partial();
+
+export const inviteMemberSchema = z.object({
+  email: z.string().email(),
+  sharePercentage: z.number().min(0).max(100),
+});
+
+export const updateMemberSchema = z.object({
+  status: z.enum(["PENDING", "ACCEPTED", "DECLINED"]).optional(),
+  sharePercentage: z.number().min(0).max(100).optional(),
+});
+
+export const togglePaySchema = z.object({
+  paid: z.boolean(),
+});

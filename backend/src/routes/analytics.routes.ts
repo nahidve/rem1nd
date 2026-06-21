@@ -121,4 +121,123 @@ router.get("/history", authenticate, async (req, res) => {
   return ApiResponse.success(res, history);
 });
 
+router.get("/forecast", authenticate, async (req, res) => {
+  const userId = req.user!.dbUserId;
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { homeCurrency: true } as any,
+  });
+  const homeCurrency = (dbUser as any)?.homeCurrency || "INR";
+
+  const subscriptions = await prisma.subscription.findMany({
+    where: { userId },
+  });
+
+  const reminders = await prisma.reminder.findMany({
+    where: { userId, isActive: true },
+  });
+
+  const now = new Date();
+  const days30 = new Date(now); days30.setDate(now.getDate() + 30);
+  const days60 = new Date(now); days60.setDate(now.getDate() + 60);
+  const days90 = new Date(now); days90.setDate(now.getDate() + 90);
+
+  const forecastEvents: any[] = [];
+  
+  // 1. Project subscriptions
+  subscriptions.forEach(sub => {
+    let projectDate = new Date(sub.renewalDate);
+    const amountInHome = convertCurrency(Number(sub.amount), (sub as any).currency || "INR", homeCurrency);
+
+    while (projectDate.getTime() <= days90.getTime()) {
+      if (projectDate.getTime() >= now.getTime()) {
+        forecastEvents.push({
+          type: "Subscription",
+          name: sub.name,
+          category: sub.category,
+          amount: Number(sub.amount),
+          amountInHome,
+          currency: sub.currency,
+          dueDate: new Date(projectDate),
+        });
+      }
+      
+      if (sub.billingType === "YEARLY") {
+        projectDate.setFullYear(projectDate.getFullYear() + 1);
+      } else {
+        projectDate.setMonth(projectDate.getMonth() + 1);
+      }
+    }
+  });
+
+  // 2. Project reminders
+  reminders.forEach(rem => {
+    let projectDate = new Date(rem.dueDate);
+    const amountInHome = convertCurrency(Number(rem.amount || 0), rem.currency || "INR", homeCurrency);
+
+    if (rem.repeatType === "ONCE") {
+      if (projectDate.getTime() >= now.getTime() && projectDate.getTime() <= days90.getTime()) {
+        forecastEvents.push({
+          type: "Reminder",
+          name: rem.title,
+          category: rem.category,
+          amount: Number(rem.amount || 0),
+          amountInHome,
+          currency: rem.currency,
+          dueDate: new Date(projectDate),
+        });
+      }
+    } else {
+      while (projectDate.getTime() <= days90.getTime()) {
+        if (projectDate.getTime() >= now.getTime()) {
+          forecastEvents.push({
+            type: "Reminder",
+            name: rem.title,
+            category: rem.category,
+            amount: Number(rem.amount || 0),
+            amountInHome,
+            currency: rem.currency,
+            dueDate: new Date(projectDate),
+          });
+        }
+
+        if (rem.repeatType === "YEARLY") {
+          projectDate.setFullYear(projectDate.getFullYear() + 1);
+        } else {
+          projectDate.setMonth(projectDate.getMonth() + 1);
+        }
+      }
+    }
+  });
+
+  forecastEvents.sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
+
+  let total30 = 0;
+  let total60 = 0;
+  let total90 = 0;
+
+  forecastEvents.forEach(e => {
+    if (e.dueDate.getTime() <= days30.getTime()) {
+      total30 += e.amountInHome;
+    }
+    if (e.dueDate.getTime() <= days60.getTime()) {
+      total60 += e.amountInHome;
+    }
+    if (e.dueDate.getTime() <= days90.getTime()) {
+      total90 += e.amountInHome;
+    }
+  });
+
+  return ApiResponse.success(res, {
+    homeCurrency,
+    forecast: {
+      days30: { total: total30, eventCount: forecastEvents.filter(e => e.dueDate.getTime() <= days30.getTime()).length },
+      days60: { total: total60, eventCount: forecastEvents.filter(e => e.dueDate.getTime() <= days60.getTime()).length },
+      days90: { total: total90, eventCount: forecastEvents.filter(e => e.dueDate.getTime() <= days90.getTime()).length },
+    },
+    upcomingEvents: forecastEvents,
+  }, "Cash flow forecast generated");
+});
+
 export default router;

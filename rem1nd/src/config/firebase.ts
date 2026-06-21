@@ -11,6 +11,8 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
+console.log("[Firebase Config debug] API Key loaded:", firebaseConfig.apiKey ? "YES (length: " + firebaseConfig.apiKey.length + ")" : "NO/UNDEFINED");
+
 const app = initializeApp(firebaseConfig);
 
 let firebaseAuth;

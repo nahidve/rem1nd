@@ -47,3 +47,29 @@ export async function updateSubscription(
 export async function deleteSubscription(id: string) {
   await api.delete(`/subscriptions/${id}`);
 }
+
+export async function getSubscriptionGroup(id: string) {
+  const res = await api.get(`/subscriptions/${id}/group`);
+  return res.data.data;
+}
+
+export async function activateSubscriptionGroup(id: string) {
+  const res = await api.post(`/subscriptions/${id}/group`);
+  return res.data.data;
+}
+
+export async function inviteGroupMember(id: string, email: string, sharePercentage: number) {
+  const res = await api.post(`/subscriptions/${id}/group/members`, { email, sharePercentage });
+  return res.data.data;
+}
+
+export async function updateGroupMember(id: string, memberId: string, status?: string, sharePercentage?: number) {
+  const res = await api.put(`/subscriptions/${id}/group/members/${memberId}`, { status, sharePercentage });
+  return res.data.data;
+}
+
+export async function toggleGroupMemberPay(id: string, memberId: string, paid: boolean) {
+  const res = await api.put(`/subscriptions/${id}/group/members/${memberId}/pay`, { paid });
+  return res.data.data;
+}
+

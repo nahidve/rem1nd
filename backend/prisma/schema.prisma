@@ -19,6 +19,7 @@ model User {
   reminders     Reminder[]
   subscriptions Subscription[]
   payments      PaymentHistory[]
+  groupMemberships SubscriptionGroupMember[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([firebaseUid])
@@ -53,10 +54,22 @@ model Subscription {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   payments      PaymentHistory[]
+  usages        SubscriptionUsage[]
+  group         SubscriptionGroup?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([userId])
   @@index([renewalDate])
+}
+
+model SubscriptionUsage {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  usedAt         DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+
+  @@index([subscriptionId])
 }
 
 enum RepeatType {
@@ -83,3 +96,35 @@ model PaymentHistory {
   @@index([userId])
   @@index([subscriptionId])
 }
+
+model SubscriptionGroup {
+  id             String                    @id @default(cuid())
+  subscriptionId String                    @unique
+  subscription   Subscription              @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  members        SubscriptionGroupMember[]
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+}
+
+model SubscriptionGroupMember {
+  id              String            @id @default(cuid())
+  groupId         String
+  group           SubscriptionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId          String?
+  user            User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email           String
+  sharePercentage Decimal           @default(0)
+  status          GroupMemberStatus @default(PENDING)
+  paid            Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([groupId, email])
+}
+
+enum GroupMemberStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+

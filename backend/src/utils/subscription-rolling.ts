@@ -17,6 +17,19 @@ export async function rollUserSubscriptions(userId: string) {
   for (const sub of overdueSubscriptions) {
     let nextRenewal = new Date(sub.renewalDate);
 
+    // Fast-forward renewal date if it's way in the past to avoid hanging and db bloat
+    if (sub.billingType === "MONTHLY") {
+      const monthsDiff = (now.getFullYear() - nextRenewal.getFullYear()) * 12 + (now.getMonth() - nextRenewal.getMonth());
+      if (monthsDiff > 12) {
+        nextRenewal.setMonth(nextRenewal.getMonth() + (monthsDiff - 12));
+      }
+    } else if (sub.billingType === "YEARLY") {
+      const yearsDiff = now.getFullYear() - nextRenewal.getFullYear();
+      if (yearsDiff > 5) {
+        nextRenewal.setFullYear(nextRenewal.getFullYear() + (yearsDiff - 5));
+      }
+    }
+
     // Iteratively roll forward until the renewal date is in the future
     while (nextRenewal <= now) {
       await (prisma as any).paymentHistory.create({

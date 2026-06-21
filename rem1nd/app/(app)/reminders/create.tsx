@@ -51,7 +51,10 @@ export default function CreateReminder() {
 
       router.replace("/reminders");
     } catch (e: any) {
-      Alert.alert("Error", e.message);
+      const errMsg = e.response?.data?.errors
+        ? e.response.data.errors.map((err: any) => `${err.path.join(".")}: ${err.message}`).join("\n")
+        : e.response?.data?.message || e.message;
+      Alert.alert("Error", errMsg);
     }
   };
 
