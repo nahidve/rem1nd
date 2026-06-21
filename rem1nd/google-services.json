@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "823882240277",
+    "project_id": "rem1nd-3f633",
+    "storage_bucket": "rem1nd-3f633.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823882240277:android:7f14366d613a76f9b3991c",
+        "android_client_info": {
+          "package_name": "com.nahhid.rem1nd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823882240277-c0550audclage8smmn8ahispni79n68d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nahhid.rem1nd",
+            "certificate_hash": "e440ebbd1c1de20c22cd6d46dd6bac32dc4dac23"
+          }
+        },
+        {
+          "client_id": "823882240277-7gkit7ak22kqhtau91hg4ume7dfta0tt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_ftTIXAsrzWxeAxnfj4H6RBvREjBIlls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "823882240277-7gkit7ak22kqhtau91hg4ume7dfta0tt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
